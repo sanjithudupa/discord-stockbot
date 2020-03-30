@@ -24,7 +24,7 @@ public class StockData {
     public String priceOf(String ticker){
         String url = "https://finance.yahoo.com/quote/" + ticker;
         String lookingFor = "<span class=\"Trsdu(0.3s) Fw(b) Fz(36px) Mb(-4px) D(ib)\" data-reactid=\"50\">";
-        String stockPrice = "Sorry, I didn't find a value. Possibly the ticker input is invalid.";
+        String stockPrice = "Sorry, I didn't find a value. Perhaps the ticker input is invalid.";
 
         try{
             Document document = Jsoup.connect(url).get();
@@ -37,7 +37,7 @@ public class StockData {
                     //trim to not spaces
                     int beginningOfLine = line.indexOf("<");
                     line = line.substring(beginningOfLine + lookingFor.length(), line.indexOf("<",beginningOfLine + 2));
-                    stockPrice = line;
+                    stockPrice = "$" + line;
                 }
 
             }
