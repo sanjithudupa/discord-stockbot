@@ -16,39 +16,15 @@ import java.net.URLConnection;
 
 public class StockData {
 
-//    public static void main(String[] args) {
-//        String ticker = "AAPL";
-//        String url = "https://finance.yahoo.com/quote/" + ticker;
-//        String lookingFor = "<span class=\"Trsdu(0.3s) Fw(b) Fz(36px) Mb(-4px) D(ib)\" data-reactid=\"50\">";
-//        double stockPrice;
-//
-//        try{
-//            Document document = Jsoup.connect(url).get();
-//            String htmlCode = document.outerHtml();
-//
-//            String[] lines = htmlCode.split(System.getProperty("line.separator"));
-//
-//            for(String line : lines){
-//                if(line.contains(lookingFor)){
-//                    //trim to not spaces
-//                    int beginningOfLine = line.indexOf("<");
-//                    line = line.substring(beginningOfLine + lookingFor.length(), line.indexOf("<",beginningOfLine + 2));
-//                    stockPrice = Double.valueOf(line);
-//                    System.out.println(stockPrice);
-//                }
-//
-//            }
-//
-//
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
-//    }
-
+    /**
+     *
+     * @param ticker The ticker name of the company (ex. Tesla = TSLA, Apple = APPL, Google = GOOG, etc.)
+     * @return Will return a string containing the price of a certain stock
+     */
     public String priceOf(String ticker){
         String url = "https://finance.yahoo.com/quote/" + ticker;
         String lookingFor = "<span class=\"Trsdu(0.3s) Fw(b) Fz(36px) Mb(-4px) D(ib)\" data-reactid=\"50\">";
-        String stockPrice = "didn't find value";
+        String stockPrice = "Sorry, I didn't find a value. Possibly the ticker input is invalid.";
 
         try{
             Document document = Jsoup.connect(url).get();

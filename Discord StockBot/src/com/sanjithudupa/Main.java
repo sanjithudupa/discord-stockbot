@@ -11,9 +11,10 @@ public class Main {
         StockData sd = new StockData();
         String callCommand = "stock.";
 
-        String token = "Njk0MjQ0MDM3MTIwNDkxNjQy.XoIzaA.EuqNbk-0R3jpJOTCvWw_pxnxTI8";
+        String token = "Njk0MjQ0MDM3MTIwNDkxNjQy.XoJimQ.IWZVzzlTLQeZe_b5zi4GThpJw98";
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
+
 
         api.addMessageCreateListener(event -> {
             if (event.getMessageContent().contains(callCommand)) {
@@ -21,6 +22,9 @@ public class Main {
                 event.getChannel().sendMessage(sd.priceOf(ticker));
             }
         });
+
+
+        System.out.println("logged in");
 
 
 
