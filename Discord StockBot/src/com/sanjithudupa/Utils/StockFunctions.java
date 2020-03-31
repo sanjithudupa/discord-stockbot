@@ -19,15 +19,18 @@ import java.net.URLConnection;
 
 public class StockFunctions {
 
+    //https://www.marketwatch.com/tools/quotes/lookup.asp?siteID=mktw&Lookup=Apple&Country=all&Type=All
+
     /**
-     *
      * @param ticker The ticker name of the company (ex. Tesla = TSLA, Apple = APPL, Google = GOOG, etc.)
      * @return Will return a stock containing the price of a certain stock, the company name and a graph of the stock
      */
-    public Stock companyStock(String ticker){
-        String main_url =  "https://finance.yahoo.com/quote/" + ticker;
+    public Stock companyStock(String ticker) {
+        String main_url = "https://finance.yahoo.com/quote/" + ticker;
         String beginningOfGraphURL = "https://research.tdameritrade.com/";
         String graph_url = beginningOfGraphURL + "grid/public/research/stocks/summary?fromPage=overview&display=&fromSearch=true&symbol=" + ticker;
+        String symbols_url_beginning = "https://www.marketwatch.com/tools/quotes/lookup.asp?siteID=mktw&Lookup=";
+        String symbols_url_ending = "&Country=all&Type=All";
 
         String priceSearch = "<span class=\"Trsdu(0.3s) Fw(b) Fz(36px) Mb(-4px) D(ib)\" data-reactid=\"50\">";
         String stockPrice = "Sorry, I didn't find a value. Perhaps the ticker input is invalid.";
@@ -43,39 +46,56 @@ public class StockFunctions {
         String graphAddress = "https://assets-global.website-files.com/583347ca8f6c7ee058111b55/5afc770caa130421393fa412_google-doc-error-message.png";
 
 
+        Stock stock = new Stock(stockPrice, companyName, graphAddress, increase, positive);
 
-        Stock stock = new Stock(stockPrice, companyName, graphAddress,increase, positive);
+        if(!validTicker(ticker)){
+            System.out.println("invalids");
+            try {
+                Document document = Jsoup.connect(symbols_url_beginning + ticker + symbols_url_ending).get();
+                String htmlCode = document.outerHtml();
+                String[] lines = htmlCode.split(System.getProperty("line.separator"));
+                Element table = document.selectFirst("table");
+                Element row1 = table.selectFirst("tr");
+                System.out.println(row1.selectFirst("td").text());
+
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
 
         //find all info from yahoo
-        try{
+        try {
             Document document = Jsoup.connect(main_url).get();
             String htmlCode = document.outerHtml();
 
             String[] lines = htmlCode.split(System.getProperty("line.separator"));
 
             //find company name
-            for(String line : lines){
-                if(line.contains(nameSearch)){
+            for (String line : lines) {
+                if (line.contains(nameSearch)) {
                     //trim to not spaces
                     int beginningOfLine = line.indexOf("<");
-                    line = line.substring(beginningOfLine + nameSearch.length(), line.indexOf("<",beginningOfLine + 2));
+                    line = line.substring(beginningOfLine + nameSearch.length(), line.indexOf("<", beginningOfLine + 2));
                     companyName = line;
                 }
 
             }
 
             //find stock price and increase amount
-            for(String line : lines){
-                if(line.contains(priceSearch)){
+            for (String line : lines) {
+                if (line.contains(priceSearch)) {
                     String og = line;
 
                     int beginningOfLine = line.indexOf("<");
-                    line = line.substring(beginningOfLine + priceSearch.length(), line.indexOf("<",beginningOfLine + 2));
+                    line = line.substring(beginningOfLine + priceSearch.length(), line.indexOf("<", beginningOfLine + 2));
                     stockPrice = line;
 
                     //find increase amount
                     line = og;
-                    line = line.substring(line.indexOf(">", line.indexOf("Fz(24px)")) + 1, line.indexOf("<",line.indexOf("Fz(24px")));
+                    line = line.substring(line.indexOf(">", line.indexOf("Fz(24px)")) + 1, line.indexOf("<", line.indexOf("Fz(24px")));
                     increase = line;
                 }
 
@@ -89,8 +109,8 @@ public class StockFunctions {
 
             lines = htmlCode.split(System.getProperty("line.separator"));
 
-            for(String line : lines){
-                if(line.contains(graphSearch)){
+            for (String line : lines) {
+                if (line.contains(graphSearch)) {
                     //trim to just image url
                     int beginningOfLine = line.indexOf("<");
                     line = "/" + line.substring(beginningOfLine + graphSearch.length(), line.indexOf("\"", line.indexOf("/grid")));
@@ -100,14 +120,13 @@ public class StockFunctions {
             }
 
 
-
-
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+
 
         }
 
-        if(increase.contains("+")){
+        if (increase.contains("+")) {
             positive = true;
         }
 
@@ -120,4 +139,19 @@ public class StockFunctions {
         return stock;
 
     }
+
+
+    boolean validTicker(String ticker) {
+        String main_url = "https://finance.yahoo.com/quote/" + ticker;
+        try {
+            Document document = Jsoup.connect(main_url).get();
+            String htmlCode = document.outerHtml();
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
+
 }

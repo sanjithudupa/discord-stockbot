@@ -22,7 +22,7 @@ public class Main {
     public static void main(String[] args) {
         StockFunctions sf = new StockFunctions();
         String callCommand = "stock.";
-        String token = "Njk0MjQ0MDM3MTIwNDkxNjQy.XoM8Kg.QGJEpZruBJcaJ2xVGD6UoGfHR1E";
+        String token = "Njk0MjQ0MDM3MTIwNDkxNjQy.XoNSfA.vq6I3K-ykKTxutxiELoy4ptwZWs";
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
 
