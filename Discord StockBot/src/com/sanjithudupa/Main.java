@@ -1,53 +1,52 @@
 package com.sanjithudupa;
 
 
+import com.sanjithudupa.Utils.Stock;
+import com.sanjithudupa.Utils.StockFunctions;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.user.UserStatus;
+import org.jsoup.Jsoup;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class Main {
 
 
     public static void main(String[] args) {
-        StockData sd = new StockData();
+        StockFunctions sf = new StockFunctions();
         String callCommand = "stock.";
-        String helpCommand = "help";
-
-        String token = "Njk0MjQ0MDM3MTIwNDkxNjQy.XoJrig.ftN2Ook5db67tJHgkTzkfF7avfw";
+        String token = "Njk0MjQ0MDM3MTIwNDkxNjQy.XoKG8g.lky_wvORZr7t2ap0MtQUlRCtIuE";
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
 
         api.addMessageCreateListener(event -> {
 
             if (event.getMessageContent().contains(callCommand)) {
+
                 String afterCall = event.getMessageContent().substring(callCommand.length());
+                Stock stock = sf.companyStock(afterCall);
 
+                EmbedBuilder stockData = new EmbedBuilder()
+                        .setTitle(stock.companyName)
+                        .addField("Price: ",   stock.price, true)
+                        .addField("Symbol: ",   afterCall.toUpperCase(), true)
+                        .setFooter("StockBot by Sanjith Udupa")
+                        .setImage(stock.graphAddress);
                 
-                if(afterCall == helpCommand){
-                    //help procedure
-                    EmbedBuilder embed = new EmbedBuilder()
-                            .setTitle("Stock Bot Commands")
-                            .addField(callCommand + helpCommand,   "Help", true)
-                            .addField(callCommand + "Stock Symbol", "Find Stock Price", true)
-                            .setFooter("Go to this website to find tickers")
-                            .setUrl("https://stocks.tradingcharts.com/stocks/symbols/s");
-                }else{
-                    //stock command
-                    event.getChannel().sendMessage(sd.priceOf(afterCall));
-                }
-
+                event.getChannel().sendMessage(stockData);
 
             }
 
-
-
         });
 
-
         System.out.println("logged in");
-
-
 
     }
 }
