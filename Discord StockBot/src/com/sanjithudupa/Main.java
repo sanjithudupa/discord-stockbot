@@ -22,7 +22,7 @@ public class Main {
     public static void main(String[] args) {
         StockFunctions sf = new StockFunctions();
         String callCommand = "stock.";
-        String token = "Njk0MjQ0MDM3MTIwNDkxNjQy.XoKG8g.lky_wvORZr7t2ap0MtQUlRCtIuE";
+        String token = "Njk0MjQ0MDM3MTIwNDkxNjQy.XoM8Kg.QGJEpZruBJcaJ2xVGD6UoGfHR1E";
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
 
@@ -33,13 +33,21 @@ public class Main {
                 String afterCall = event.getMessageContent().substring(callCommand.length());
                 Stock stock = sf.companyStock(afterCall);
 
+                Color messageColor = Color.red;
+
+                if(stock.positive){
+                    messageColor = Color.green;
+                }
+
                 EmbedBuilder stockData = new EmbedBuilder()
                         .setTitle(stock.companyName)
                         .addField("Price: ",   stock.price, true)
                         .addField("Symbol: ",   afterCall.toUpperCase(), true)
-                        .setFooter("StockBot by Sanjith Udupa")
+                        .addField("Change: ", stock.increase)
+                        .setFooter("StockBot by Sanjith Udupa. Number data from finance.yahoo.com, graphs from research.tdameritrade.com.")
+                        .setColor(messageColor)
                         .setImage(stock.graphAddress);
-                
+
                 event.getChannel().sendMessage(stockData);
 
             }

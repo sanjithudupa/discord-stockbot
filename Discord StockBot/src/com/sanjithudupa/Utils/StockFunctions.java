@@ -35,19 +35,25 @@ public class StockFunctions {
         String nameSearch = "<h1 class=\"D(ib) Fz(18px)\" data-reactid=\"7\">";
         String companyName = "";
 
-        String graphAddress = "https://www.howtogeek.com/thumbcache/2/200/adec3eac582bebd79fcbcdb4fba86a2f/wp-content/uploads/2013/05/windows-8-blue-screen-header.png";
+        String increaseSearch = "<span class=\"Trsdu(0.3s) Fw(500) Pstart(10px) Fz(24px) C($data";
+        String increase = "";
+        boolean positive = false;
+
         String graphSearch = "<img src=\"/";
+        String graphAddress = "https://assets-global.website-files.com/583347ca8f6c7ee058111b55/5afc770caa130421393fa412_google-doc-error-message.png";
 
 
-        Stock stock = new Stock(stockPrice, companyName, graphAddress);
 
-        //find all text-based information(company name,
+        Stock stock = new Stock(stockPrice, companyName, graphAddress,increase, positive);
+
+        //find all info from yahoo
         try{
             Document document = Jsoup.connect(main_url).get();
             String htmlCode = document.outerHtml();
 
             String[] lines = htmlCode.split(System.getProperty("line.separator"));
 
+            //find company name
             for(String line : lines){
                 if(line.contains(nameSearch)){
                     //trim to not spaces
@@ -58,18 +64,24 @@ public class StockFunctions {
 
             }
 
+            //find stock price and increase amount
             for(String line : lines){
                 if(line.contains(priceSearch)){
-                    //trim to not spaces
+                    String og = line;
+
                     int beginningOfLine = line.indexOf("<");
                     line = line.substring(beginningOfLine + priceSearch.length(), line.indexOf("<",beginningOfLine + 2));
                     stockPrice = line;
+
+                    //find increase amount
+                    line = og;
+                    line = line.substring(line.indexOf(">", line.indexOf("Fz(24px)")) + 1, line.indexOf("<",line.indexOf("Fz(24px")));
+                    increase = line;
                 }
 
             }
 
-
-            //find graph
+            //find graph from tdameritrade
 
             document = Jsoup.connect(graph_url).get();
             htmlCode = document.outerHtml();
@@ -95,9 +107,15 @@ public class StockFunctions {
 
         }
 
+        if(increase.contains("+")){
+            positive = true;
+        }
+
         stock.companyName = companyName;
         stock.price = stockPrice;
         stock.graphAddress = graphAddress;
+        stock.increase = increase;
+        stock.positive = positive;
 
         return stock;
 

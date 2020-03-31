@@ -1,4 +1,4 @@
-package com.sanjithudupa;
+package com.sanjithudupa.Utils;
 
 
 import org.javacord.api.DiscordApi;
@@ -13,7 +13,7 @@ import org.javacord.api.DiscordApiBuilder;
 public class GetInviteLink {
 
     public static void main(String[] args) {
-        String token = "Njk0MjQ0MDM3MTIwNDkxNjQy.XoJrig.ftN2Ook5db67tJHgkTzkfF7avfw";
+        String token = "Njk0MjQ0MDM3MTIwNDkxNjQy.XoM8Kg.QGJEpZruBJcaJ2xVGD6UoGfHR1E";
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
 
