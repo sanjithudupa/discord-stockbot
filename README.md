@@ -2,7 +2,7 @@
 This is a bot I made for Discord in Java called Stock Bot.
 
 ## Usage
-When the bot is active/online, type stock.(some company's ticker)
+When the bot is active/online, type stock.(some company's symbol/ticker)
 For example, a valid command would be stock.GOOG
 
 ## Libraries
