@@ -1,36 +1,23 @@
 package com.sanjithudupa.Utils;
 
-
-
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
+import java.util.Timer;
 
 public class StockFunctions {
-
-    //https://www.marketwatch.com/tools/quotes/lookup.asp?siteID=mktw&Lookup=Apple&Country=all&Type=All
 
     /**
      * @param ticker The ticker name of the company (ex. Tesla = TSLA, Apple = APPL, Google = GOOG, etc.)
      * @return Will return a stock containing the price of a certain stock, the company name and a graph of the stock
      */
     public Stock companyStock(String ticker) {
+        double startTime = System.currentTimeMillis();
         String main_url = "https://finance.yahoo.com/quote/" + ticker;
         String beginningOfGraphURL = "https://research.tdameritrade.com/";
         String graph_url = beginningOfGraphURL + "grid/public/research/stocks/summary?fromPage=overview&display=&fromSearch=true&symbol=" + ticker;
-        String symbols_url_beginning = "https://www.marketwatch.com/tools/quotes/lookup.asp?siteID=mktw&Lookup=";
-        String symbols_url_ending = "&Country=all&Type=All";
 
         String priceSearch = "<span class=\"Trsdu(0.3s) Fw(b) Fz(36px) Mb(-4px) D(ib)\" data-reactid=\"50\">";
         String stockPrice = "Sorry, I didn't find a value. Perhaps the ticker input is invalid.";
@@ -38,7 +25,6 @@ public class StockFunctions {
         String nameSearch = "<h1 class=\"D(ib) Fz(18px)\" data-reactid=\"7\">";
         String companyName = "";
 
-        String increaseSearch = "<span class=\"Trsdu(0.3s) Fw(500) Pstart(10px) Fz(24px) C($data";
         String increase = "";
         boolean positive = false;
 
@@ -46,30 +32,27 @@ public class StockFunctions {
         String graphAddress = "https://assets-global.website-files.com/583347ca8f6c7ee058111b55/5afc770caa130421393fa412_google-doc-error-message.png";
 
 
-        Stock stock = new Stock(stockPrice, companyName, graphAddress, increase, positive);
-
-        if(!validTicker(ticker)){
-            System.out.println("invalids");
-            try {
-                Document document = Jsoup.connect(symbols_url_beginning + ticker + symbols_url_ending).get();
-                String htmlCode = document.outerHtml();
-                String[] lines = htmlCode.split(System.getProperty("line.separator"));
-                Element table = document.selectFirst("table");
-                Element row1 = table.selectFirst("tr");
-                System.out.println(row1.selectFirst("td").text());
-
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
+        Stock stock = new Stock(stockPrice, companyName, graphAddress, increase, positive, ticker);
 
         //find all info from yahoo
         try {
             Document document = Jsoup.connect(main_url).get();
             String htmlCode = document.outerHtml();
+
+            if(htmlCode.contains("Symbols similar to '" + ticker.toLowerCase() + "'")){
+                //didn't work
+
+                String[] lines = htmlCode.split(System.getProperty("line.separator"));
+                Element table = document.selectFirst("table");
+                Elements rows = table.select("tr");
+                rows.remove(0);
+                Element row1 = rows.first();
+                Element info = row1.selectFirst("td");
+                System.out.println(info.text());
+                return companyStock(info.text());
+
+
+            }
 
             String[] lines = htmlCode.split(System.getProperty("line.separator"));
 
@@ -79,7 +62,7 @@ public class StockFunctions {
                     //trim to not spaces
                     int beginningOfLine = line.indexOf("<");
                     line = line.substring(beginningOfLine + nameSearch.length(), line.indexOf("<", beginningOfLine + 2));
-                    companyName = line;
+                    companyName = line.substring(0,line.length()-2-ticker.length());
                 }
 
             }
@@ -102,7 +85,6 @@ public class StockFunctions {
             }
 
             //find graph from tdameritrade
-
             document = Jsoup.connect(graph_url).get();
             htmlCode = document.outerHtml();
 
@@ -123,7 +105,6 @@ public class StockFunctions {
         } catch (Exception e) {
             e.printStackTrace();
 
-
         }
 
         if (increase.contains("+")) {
@@ -135,22 +116,9 @@ public class StockFunctions {
         stock.graphAddress = graphAddress;
         stock.increase = increase;
         stock.positive = positive;
+        stock.timeToGetData = System.currentTimeMillis() - startTime;
 
         return stock;
-
-    }
-
-
-    boolean validTicker(String ticker) {
-        String main_url = "https://finance.yahoo.com/quote/" + ticker;
-        try {
-            Document document = Jsoup.connect(main_url).get();
-            String htmlCode = document.outerHtml();
-
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
 
     }
 

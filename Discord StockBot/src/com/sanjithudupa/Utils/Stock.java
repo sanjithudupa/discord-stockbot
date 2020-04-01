@@ -6,13 +6,16 @@ public class Stock {
     public String graphAddress;
     public String increase;
     public boolean positive;
+    public String ticker;
+    public double timeToGetData;
 
-    public Stock(String p, String c, String g, String i, boolean pos){
+    public Stock(String p, String c, String g, String i, boolean pos, String t){
         price = p;
         companyName = c;
         graphAddress = c;
         increase = i;
         positive = pos;
+        ticker = t;
 
     }
 
