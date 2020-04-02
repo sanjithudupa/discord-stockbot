@@ -1,6 +1,7 @@
 package com.sanjithudupa;
 
 
+import com.sanjithudupa.Utils.Secret;
 import com.sanjithudupa.Utils.Stock;
 import com.sanjithudupa.Utils.StockFunctions;
 import org.javacord.api.DiscordApi;
@@ -20,10 +21,9 @@ public class Main {
         final StockFunctions[] sf = {new StockFunctions()};
         final String[] callCommand = {"stock."};
         String helpCommand = "help";
-        String changeCommand = "change";
-        String token = "Njk0MjQ0MDM3MTIwNDkxNjQy.XoPmCQ.-jcgsVIM8ylT9LhRuUkGQhXOigk";
+        String changeCommand = "prefix";
 
-        DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
+        DiscordApi api = new DiscordApiBuilder().setToken(Secret.token).login().join();
 
         api.addMessageCreateListener(event -> {
 
@@ -36,40 +36,24 @@ public class Main {
                     EmbedBuilder helpInfo = new EmbedBuilder()
                             .setTitle("StockBot Commands")
                             .addField("Help: ", "stock." + helpCommand, true)
-                            .addField("Get Stock Information: ", "stock.StockSymbol(fastest & preferred) or stock.CompanyName (ex. stock.AAPL)", true)
-                            .addField("**[NOT WORKING ATM]** Change Call Command: ", "stock." + changeCommand, true)
+                            .addField("Get Stock Information: ", "stock.symbol or stock.name (ex. stock.AAPL)", true)
+                            .addField("Change Call Command: ", "stock." + changeCommand)
                             .setColor(Color.ORANGE)
                             .setFooter("StockBot by Sanjith Udupa. Number data from finance.yahoo.com, graphs from research.tdameritrade.com.");
 
 
                     event.getChannel().sendMessage(helpInfo);
 
-                }/*else if(afterCall.contains(changeCommand)){
-                    event.getChannel().sendMessage("You have 5 seconds to respond with a new command");
+                }else if(afterCall.contains(changeCommand)){
+                    String newCommand = afterCall.substring(afterCall.indexOf(changeCommand) + changeCommand.length());
 
-                    try {
-                        api.wait(5);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
 
-                    final String[] newCommand = {callCommand[0]};
 
-                    ListenerManager<MessageCreateListener> listenerManager = api.addMessageCreateListener(event2 -> {
+                    callCommand[0] = newCommand.trim() + ".";
 
-                        newCommand[0] = event2.getMessageContent();
-                    });
+                    event.getChannel().sendMessage("Successfully changed call command to \"" + callCommand[0] + "\"");
 
-                    callCommand[0] = newCommand[0];
-
-//                    String newCommand = afterCall.substring(afterCall.indexOf(changeCommand) + changeCommand.length());
-//                        callCommand[0] = newCommand;
-
-                    listenerManager.remove();
-
-                    event.getChannel().sendMessage("Successfully changed call command to \"" + newCommand[0] + "\"");
-
-                } */else{
+                }else{
                     Stock stock = sf[0].companyStock(afterCall);
 
                     Color messageColor = Color.red;
@@ -79,10 +63,26 @@ public class Main {
                     }
 
                     EmbedBuilder stockData = new EmbedBuilder()
-                            .setTitle(stock.companyName)
-                            .addField("Price: ",   stock.price, true)
-                            .addField("Symbol: ",   stock.ticker.toUpperCase(), true)
-                            .addField("Change: ", stock.increase)
+                            .setTitle("**"+stock.companyName+"**")
+                            .addField("**Price: **",   stock.price, true)
+                            .addField("Symbol: ",   "**" + stock.ticker.toUpperCase() + "**", true)
+                            .addField("Change: ", stock.increase, true)
+                            .addField("Previous Close: ", stock.prevClose, true)
+                            .addField("Open: ", stock.open,true)
+                            .addField("Bid: ", stock.bid, true)
+                            .addField("Ask: ", stock.ask, true)
+                            .addField("Day's Range: ", stock.dayRange, true)
+                            .addField("52 Week Range: ", stock.ftwRange, true)
+                            .addField("Volume: ", stock.vol, true)
+                            .addField("Avg. Volume: ", stock.avgVol, true)
+                            .addField("Market Cap: ", stock.marketCap, true)
+                            .addField("Beta (5Y Monthly): ", stock.beta,true)
+                            .addField("PE Ratio (TTM): ", stock.peRatio, true)
+                            .addField("EPS (TTM): ", stock.eps, true)
+                            .addField("Earnings Date: ", stock.earningsDate, true)
+                            .addField("Forward Dividend & Yield: ", stock.forward,true)
+                            .addField("Ex-Dividend Date: ", stock.exDiv, true)
+                            .addField("1y Target Est: ", stock.oneYTarget, true)
                             .setFooter("StockBot by Sanjith Udupa. Number data from finance.yahoo.com, graphs from research.tdameritrade.com.\nFinished in " + stock.timeToGetData/1000+ "s.")
                             .setColor(messageColor)
                             .setTimestampToNow()

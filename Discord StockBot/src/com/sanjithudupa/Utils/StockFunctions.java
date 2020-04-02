@@ -31,6 +31,23 @@ public class StockFunctions {
         String graphSearch = "<img src=\"/";
         String graphAddress = "https://assets-global.website-files.com/583347ca8f6c7ee058111b55/5afc770caa130421393fa412_google-doc-error-message.png";
 
+        String[] otherData = new String[16];
+        String prevClose = "";
+        String open = "";
+        String bid = "";
+        String ask = "";
+        String dayRange = "";
+        String ftwRange = "";
+        String vol = "";
+        String avgVol = "";
+        String marketCap = "";
+        String beta = "";
+        String peRatio = "";
+        String eps = "";
+        String earningsDate = "";
+        String forward = "";
+        String exDiv = "";
+        String oneYTarget = "";
 
         Stock stock = new Stock(stockPrice, companyName, graphAddress, increase, positive, ticker);
 
@@ -42,13 +59,11 @@ public class StockFunctions {
             if(htmlCode.contains("Symbols similar to '" + ticker.toLowerCase() + "'")){
                 //didn't work
 
-                String[] lines = htmlCode.split(System.getProperty("line.separator"));
                 Element table = document.selectFirst("table");
                 Elements rows = table.select("tr");
                 rows.remove(0);
                 Element row1 = rows.first();
                 Element info = row1.selectFirst("td");
-                System.out.println(info.text());
                 return companyStock(info.text());
 
 
@@ -84,6 +99,19 @@ public class StockFunctions {
 
             }
 
+            //W(100%)
+
+            //find other information
+            Elements table1 = document.select("table");
+            Elements rows = table1.select("tr");
+            Elements tds = rows.select("td");
+
+            int i = 0;
+            for(int j = 1; j < tds.size(); j+=2){
+                otherData[i] = tds.get(j).text();
+                i++;
+            }
+
             //find graph from tdameritrade
             document = Jsoup.connect(graph_url).get();
             htmlCode = document.outerHtml();
@@ -117,6 +145,22 @@ public class StockFunctions {
         stock.increase = increase;
         stock.positive = positive;
         stock.timeToGetData = System.currentTimeMillis() - startTime;
+        stock.prevClose = otherData[0];
+        stock.open = otherData[1];
+        stock.bid = otherData[2];
+        stock.ask = otherData[3];
+        stock.dayRange = otherData[4];
+        stock.ftwRange = otherData[5];
+        stock.vol = otherData[6];
+        stock.avgVol = otherData[7];
+        stock.marketCap = otherData[8];
+        stock.beta = otherData[9];
+        stock.peRatio = otherData[10];
+        stock.eps = otherData[11];
+        stock.earningsDate = otherData[12];
+        stock.forward = otherData[13];
+        stock.exDiv = otherData[14];
+        stock.oneYTarget = otherData[15];
 
         return stock;
 
