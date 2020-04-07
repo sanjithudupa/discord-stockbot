@@ -1,5 +1,5 @@
 # Discord StockBot
-This is a bot I made for Discord in Java called Stock Bot.
+StockBot is a 
 
 ## Usage
 When the bot is active/online, type stock.(some company's symbol/ticker)
